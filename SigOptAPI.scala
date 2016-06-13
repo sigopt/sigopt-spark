@@ -190,18 +190,4 @@ def generateObservation(suggestion_id : String, metric: Double)
 
 // case class SigCatVals(Map[category:String, value: String])
 
-
-
-
-curl \
-  
-  -X POST "https://api.sigopt.com/v1/experiments/4362/observations" \
-  -u "PZUOYJMAEQUDMYTBHAKOPJTTWBBKEDHWYZXMGUAUQMOJDQTD": \
-  -H "Content-Type: application/json" \
-  -d '{
-    "suggestion":"1333012",
-    "value":29  //metric 
-   }'
-
-
-   val suggest_url:String = "https://api.sigopt.com/v1/experiments/4362/suggestions"
+val suggest_url:String = "https://api.sigopt.com/v1/experiments/4362/suggestions"
