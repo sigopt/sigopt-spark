@@ -51,7 +51,7 @@ case class SigBounds(max: Double, min:Double)
 val experiment_id: String
 val url : String = "https://api.sigopt.com/v1/clients/1701"
 val post_url : String = "https://api.sigopt.com/v1/experiments"
-val token: String = "PZUOYJMAEQUDMYTBHAKOPJTTWBBKEDHWYZXMGUAUQMOJDQTD"  //Class variable shared by any instance instantiated 
+val token: String = $SIG_OPT_API_TOKEN  //Class variable shared by any instance instantiated 
 
 //IMplement some logic here for dealing with multiple parameters as a list of Parameter_name_max_min_types which will be just use the case classes
 def generateNewExperiment(name: String, parameter_name_max_min_type:(String, Double, Double, String)): SigExperiment =  {
