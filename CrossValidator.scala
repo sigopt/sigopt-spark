@@ -77,6 +77,7 @@ class CrossValidator @Since("1.2.0") (@Since("1.4.0") override val uid: String)
   case class SigBounds(max: Double, min: Double)
   case class SigParameters(name: String, bounds:SigBounds, `type`: String)  
   case class SigExperiment(name: String, parameters: Array[SigParameters])
+
   
   var n_iter: Int = 0
   var token: String = ""
@@ -102,7 +103,7 @@ class CrossValidator @Since("1.2.0") (@Since("1.4.0") override val uid: String)
   /** @group setParam */
   @Since("1.2.0")
   def setEstimatorParamMaps(value: Array[ParamMap]): this.type = set(estimatorParamMaps, value)
-
+  
   /** @group setParam */
   @Since("1.2.0")
   def setEvaluator(value: Evaluator): this.type = set(evaluator, value)
@@ -115,66 +116,69 @@ class CrossValidator @Since("1.2.0") (@Since("1.4.0") override val uid: String)
   @Since("2.0.0")
   def setSeed(value: Long): this.type = set(seed, value)
 
-  def setupSigCV(name: String, id: Int, token:String, iters:Int, bound_val: Array[(String, Double, Double, String)]) = {
-  	    // setSigOptToken(token_val)
+  def setSigCV(name: String, token:String, iters:Int, bound_val: Array[(String, Double, Double, String)]) = {
     this.token = token
     this.n_iter = iters
+    implicit val formats = DefaultFormats
     val post_url : String = "https://api.sigopt.com/v1/experiments"  //Endpoint for establishing an experiment
     val sigarray = mutable.ArrayBuffer[SigParameters]()
     for(i <- bound_val){sigarray += SigParameters(i._1.toString, SigBounds(i._2, i._3), i._4.toString)}
     val json_experiment:String = swrite(SigExperiment(name, sigarray.toArray))
-    val experiment_response = Http(post_url).auth(this.token, "").postData(json_experiment).headers(Seq("content-type" -> "application/json")).asString.body
-    this.experiment_id = (parse(experiment_response) \\ "id").extract[String]   //with bounds set and an experiment set save the id for further us
+    val experiment_response = Http(post_url).auth(token, "").postData(json_experiment).headers(Seq("content-type" -> "application/json")).asString.body
+    val experiment_identity = (parse(experiment_response) \\ "id").extract[String] 
+    this. experiment_id = experiment_identity  //with bounds set and an experiment set save the id for further us
   }
 
-  def askSuggestion(estimator: Estimator[_]): ParamMap = {
+  def askSuggestion(estimator: Estimator[_])= {
+    setEstimatorParamMaps(Array(estimator.extractParamMap))
+    implicit val formats = DefaultFormats
     val paramGrid = mutable.Map.empty[Param[Any], Any]
-    var suggestion_url: String = base_opt((this.experiment_id))
-    val suggestion_response = parse(Http(suggestion_url).auth(this.token, "").asString.body)
+    var suggestion_url: String = this.base_opt((this.experiment_id))
+    val suggestion_response = parse(Http(suggestion_url).postData("").auth(this.token +":","").asString.body)
     var suggest_paramMap = ((suggestion_response \\ "data")(0) \\ "assignments").extract[Map[String, Double]]  //pulling out the most recent suggestions 
     this.suggestion_id = ((suggestion_response \\ "data")(0) \\ "id").extract[String]                       //identifying the current suggestion
-    
     for (z <- suggest_paramMap){
       var param = z._1
       paramGrid.put(estimator.getParam(s"$param"), z._2)
     }
     
-    val paramMaps = new ParamMap()
-    suggest_paramMap.foreach(z => paramMaps.put(estimator.getParam(z._1), z._2))
-    paramMaps
+    var paramMaps = Array(new ParamMap)
+    for((k,v) <- paramGrid){paramMaps.map(_.put(k.asInstanceOf[Param[Any]], v))}
+    //suggest_paramMap.foreach(z => paramMaps.put(estimator.getParam(z._1), z._2))
+    setEstimatorParamMaps(paramMaps.toArray)
   }
 
-  def observeSuggestion(est: Estimator[_], metric: Double): ParamMap = {
-    case class Observations(suggestion: String, value: Double)
-    var observation_url: String = base_obs(this.experiment_id)
-    (Http(observation_url).postData(swrite(Observations(this.suggestion_id, metric))).auth(this.token, "").headers(Seq("content-type" -> "application/json"))).asString.body
+  def observeSuggestion(est: Estimator[_], metric: Double)= {
+    case class Observe(suggestion: String, value: Double)
+    var observation_url: String = this.base_obs(this.experiment_id)
+    (Http(observation_url).postData(swrite(Observe(this.suggestion_id, metric))).auth(this.token, "").headers(Seq("content-type" -> "application/json"))).asString.body
     askSuggestion(est)
   }
 
   def SigFit(dataset: Dataset[_]): CrossValidatorModel = {
       val schema = dataset.schema
-      transformSchema(schema, logging = true)
+      transformSchema(schema)
       val sparkSession = dataset.sparkSession
       val est = $(estimator)
       val eval = $(evaluator)
       //need to grab the suggestion first
-      val epm = askSuggestion(est)
+      val epm = $(estimatorParamMaps)
       val numModels = this.n_iter 
-      val metrics = new Array[Double](n_iter)
+      val metrics = new Array[Double](numModels)
       val splits = MLUtils.kFold(dataset.toDF.rdd, $(numFolds), $(seed))
       splits.zipWithIndex.foreach { case ((training, validation), splitIndex) =>
         val trainingDataset = sparkSession.createDataFrame(training, schema).cache()
         val validationDataset = sparkSession.createDataFrame(validation, schema).cache()
         // multi-model training
-        logDebug(s"Train split $splitIndex with multiple sets of parameters.")
-        val models = est.fit(trainingDataset, epm) //.asInstanceOf[Model[_]]
+        //logDebug(s"Train split $splitIndex with multiple sets of parameters.")
+        val models = est.fit(trainingDataset, epm(0)) //.asInstanceOf[Model[_]]
         trainingDataset.unpersist()
         var i = 0 
-        while (i < n_iter) {
+        while (i < numModels) {
           // TODO: duplicate evaluator to take extra params from input
-          val metric = eval.evaluate((models.asInstanceOf[Model[_]]).transform(validationDataset, epm))
+          val metric = eval.evaluate((models.asInstanceOf[Model[_]]).transform(validationDataset, epm(0)))
           metrics(i) += metric
-          observeSuggestion(est, metric)
+          this.observeSuggestion(est, metric)
           //logDebug(s"Got metric $metric for model trained with ${epm}.")
           i += 1
         }
@@ -187,7 +191,7 @@ class CrossValidator @Since("1.2.0") (@Since("1.4.0") override val uid: String)
 	      else metrics.zipWithIndex.minBy(_._1)
 	   //logInfo(s"Best set of parameters:\n${epm}")
 	   logInfo(s"Best cross-validation metric: $bestMetric.")
-	   val bestModel = (est.fit(dataset, epm)).asInstanceOf[Model[_]]
+	   val bestModel = (est.fit(dataset, epm(0))).asInstanceOf[Model[_]]
 	   copyValues(new CrossValidatorModel(uid, bestModel, metrics).setParent(this))
 
      // f2jBLAS.dscal(numModels, 1.0 / $(numFolds), metrics, 1)
@@ -200,7 +204,6 @@ class CrossValidator @Since("1.2.0") (@Since("1.4.0") override val uid: String)
       // val bestModel = est.fit(dataset, epm.asInstanceOf[Model[_]])
        //val bestMetric = eval.evaluate(modin.transform(validationDataset, epm))
        //val bestModel = est.fit(dataset, epm).asInstanceOf[Model[_]]
-
     }
      // override def transformSchema(schema: StructType): StructType = transformSchemaImpl(schema)
     //   override def copy(extra: ParamMap): CrossValidator = {
