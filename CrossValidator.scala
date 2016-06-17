@@ -130,7 +130,7 @@ class CrossValidator @Since("1.2.0") (@Since("1.4.0") override val uid: String)
   }
 
   def askSuggestion(estimator: Estimator[_])= {
-    setEstimatorParamMaps(Array(estimator.extractParamMap))
+    this.setEstimatorParamMaps(Array(estimator.extractParamMap))
     implicit val formats = DefaultFormats
     val paramGrid = mutable.Map.empty[Param[Any], Any]
     var suggestion_url: String = this.base_opt((this.experiment_id))
@@ -145,14 +145,14 @@ class CrossValidator @Since("1.2.0") (@Since("1.4.0") override val uid: String)
     var paramMaps = Array(new ParamMap)
     for((k,v) <- paramGrid){paramMaps.map(_.put(k.asInstanceOf[Param[Any]], v))}
     //suggest_paramMap.foreach(z => paramMaps.put(estimator.getParam(z._1), z._2))
-    setEstimatorParamMaps(paramMaps.toArray)
+   this.setEstimatorParamMaps(paramMaps.toArray)
   }
 
   def observeSuggestion(est: Estimator[_], metric: Double)= {
     case class Observe(suggestion: String, value: Double)
     var observation_url: String = this.base_obs(this.experiment_id)
     (Http(observation_url).postData(swrite(Observe(this.suggestion_id, metric))).auth(this.token, "").headers(Seq("content-type" -> "application/json"))).asString.body
-    askSuggestion(est)
+    this.askSuggestion(est)
   }
 
   def SigFit(dataset: Dataset[_]): CrossValidatorModel = {
