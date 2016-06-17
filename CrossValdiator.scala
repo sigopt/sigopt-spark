@@ -71,19 +71,18 @@ private[ml] trait CrossValidatorParams extends ValidatorParams {
 class CrossValidator @Since("1.2.0") (@Since("1.4.0") override val uid: String)
   extends Estimator[CrossValidatorModel]
   with CrossValidatorParams with MLWritable with Logging {
-  implicit val formats = DefaultFormats
 
+  implicit val formats = DefaultFormats
 
   case class SigBounds(max: Double, min: Double)
   case class SigParameters(name: String, bounds:SigBounds, `type`: String)  
   case class SigExperiment(name: String, parameters: Array[SigParameters])
   
+  var n_iter: Int = 0
   var token: String = ""
   var experiment_id: String= ""
   var suggestion_id: String = ""
-  var n_iter: Int = 0
-
-
+  
   @Since("1.2.0")
   def this() = this(Identifiable.randomUID("cv"))
 
@@ -116,15 +115,12 @@ class CrossValidator @Since("1.2.0") (@Since("1.4.0") override val uid: String)
   @Since("2.0.0")
   def setSeed(value: Long): this.type = set(seed, value)
 
-
-
   def setupSigCV(name: String, id: Int, token:String, iters:Int, bound_val: Array[(String, Double, Double, String)]) = {
   	    // setSigOptToken(token_val)
     this.token = token
     this.n_iter = iters
-    import scala.collection.mutable.ArrayBuffer
     val post_url : String = "https://api.sigopt.com/v1/experiments"  //Endpoint for establishing an experiment
-    val sigarray = ArrayBuffer[SigParameters]()
+    val sigarray = mutable.ArrayBuffer[SigParameters]()
     for(i <- bound_val){sigarray += SigParameters(i._1.toString, SigBounds(i._2, i._3), i._4.toString)}
     val json_experiment:String = swrite(SigExperiment(name, sigarray.toArray))
     val experiment_response = Http(post_url).auth(this.token, "").postData(json_experiment).headers(Seq("content-type" -> "application/json")).asString.body
@@ -137,16 +133,12 @@ class CrossValidator @Since("1.2.0") (@Since("1.4.0") override val uid: String)
     val suggestion_response = parse(Http(suggestion_url).auth(this.token, "").asString.body)
     var suggest_paramMap = ((suggestion_response \\ "data")(0) \\ "assignments").extract[Map[String, Double]]  //pulling out the most recent suggestions 
     this.suggestion_id = ((suggestion_response \\ "data")(0) \\ "id").extract[String]                       //identifying the current suggestion
-
+    
     for (z <- suggest_paramMap){
       var param = z._1
       paramGrid.put(estimator.getParam(s"$param"), z._2)
     }
-
-    // val paramMaps = Array(new ParamMap)
-    // paramGrid.foreach(v =>  paramMaps.map(_.put(v._1.asInstanceOf[Param[Any]], v._2)))  //strict typing is killer.
-    // setEstimatorParamMaps(paramMaps)
-    // paramGrid.empty
+    
     val paramMaps = new ParamMap()
     suggest_paramMap.foreach(z => paramMaps.put(estimator.getParam(z._1), z._2))
     paramMaps
