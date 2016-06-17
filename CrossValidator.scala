@@ -137,8 +137,8 @@ class CrossValidator @Since("1.2.0") (@Since("1.4.0") override val uid: String)
     val paramGrid = mutable.Map.empty[Param[Any], Any]
     var suggestion_url: String = this.base_opt((this.experiment_id))
     val suggestion_response = parse(Http(suggestion_url).postData("").auth(this.token +":","").asString.body)
-    var suggest_paramMap = ((suggestion_response \\ "data")(0) \\ "assignments").extract[Map[String, Double]]  //pulling out the most recent suggestions 
-    this.suggestion_id = ((suggestion_response \\ "data")(0) \\ "id").extract[String]                       //identifying the current suggestion
+    var suggest_paramMap = ((suggestion_response \\ "assignments").extract[Map[String, Double]]  //pulling out the most recent suggestions 
+    this.suggestion_id = ((suggestion_response \\ "id").extract[String]                       //identifying the current suggestion
     for (z <- suggest_paramMap){
       var param = z._1
       paramGrid.put(estimator.getParam(s"$param"), z._2)
