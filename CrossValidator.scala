@@ -74,6 +74,8 @@ class CrossValidator @Since("1.2.0") (@Since("1.4.0") override val uid: String)
 
   implicit val formats = DefaultFormats
 
+  case class Observe(suggestion: String, value: Double)
+
   case class SigBounds(max: Double, min: Double)
   case class SigParameters(name: String, bounds:SigBounds, `type`: String)  
   case class SigExperiment(name: String, parameters: Array[SigParameters])
@@ -149,7 +151,6 @@ class CrossValidator @Since("1.2.0") (@Since("1.4.0") override val uid: String)
   }
 
   def observeSuggestion(est: Estimator[_], metric: Double)= {
-    case class Observe(suggestion: String, value: Double)
     var observation_url: String = this.base_obs(this.experiment_id)
     (Http(observation_url).postData(swrite(Observe(this.suggestion_id, metric))).auth(this.token, "").headers(Seq("content-type" -> "application/json"))).asString.body
     this.askSuggestion(est)
