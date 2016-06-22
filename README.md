@@ -39,18 +39,20 @@ SigSpark integrates SigOpt's functionality into Spark for performing Bayesian op
 	>>>val lr = new LinearRegression()
 	>>>val cv = new CrossValidator()
 
-	>>># Format of bounds is: Array((String,Double,Double,String))
-	>>>#(ParameterName :String, Max: Double, Min: Double, type: String)
+	Format of bounds is: Array((String,Double,Double,String))
+	(ParameterName :String, Max: Double, Min: Double, type: String)
+
 	>>>val bounds =  Array(("elasticNetParam", 1.0, 0.0, "double"), ("regParam",1.0,0.0, "double"))
 
 	>>>cv.setNumFolds(10)
 	>>>cv.setEstimator(lr)
 	>>>cv.setEvaluator(new RegressionEvaluator)
 
-	>>>#Establish the experiment: (name: String, api_token: String, iteration: int, bounds)
+	Establish the experiment: (name: String, api_token: String, iteration: int, bounds)
+
 	>>>cv.setSigCV("Timing","ADGGBVMWFCLSDKFMGVMFLKF", 10, bounds)
 	>>>cv.askSuggestion(lr)
 
 	>>>cv.SigFit(data)
 
-
+####Application to topic modeling
