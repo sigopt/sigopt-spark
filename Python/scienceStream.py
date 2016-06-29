@@ -20,9 +20,9 @@ class Producer(object):
 				print (post)
 
 if __name__ == "__main__":
-	args = sys.argv
-	ip_addr = str(args[1])
-	partition_key = str(arg[2])
-	prod = Producer(ip_addr)
+	# args = sys.argv
+	# ip_addr = str(args[1])
+	# partition_key = str(arg[2])
+	prod = Producer()
 	while(True):
          prod.stream_science_posts(partition_key)
