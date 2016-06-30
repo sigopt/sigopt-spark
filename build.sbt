@@ -6,13 +6,18 @@ organization := "com.sigopt"
 
 scalaVersion := "2.11.8"
 
-crossScalaVersions := Seq("2.11.8")
+crossScalaVersions := Seq("2.10.6")
 
 libraryDependencies <++= (scalaVersion) { scalaVersion =>
+  val v = scalaVersion match {
+    case twoTen if scalaVersion.startsWith("2.10") => "_2.10"
+    case twoEleven if scalaVersion.startsWith("2.11") => "_2.11"
+    case _ => "_" + scalaVersion
+  }
   Seq(
     "com.sigopt"                  %  ("sigopt-java") % "2.3.1",
-    "org.apache.spark"            %  "spark-core_2.10" % "1.6.1",
-    "org.apache.spark"            %  "spark-mllib_2.10" % "1.6.1"
+    "org.apache.spark"            %  ("spark-core" + v) % "1.6.1",
+    "org.apache.spark"            %  ("spark-mllib" + v) % "1.6.1"
   )
 }
 
