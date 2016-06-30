@@ -1,12 +1,11 @@
-# SigSpark
+# sigopt-spark
 
-Compiles against the Spark 2.0 build.
+Compiles against the Spark 1.6.1 build on scala 2.10 and 2.11.
 
-SigSpark integrates SigOpt's functionality into Spark for performing Bayesian
-optimization over hyperparameters. It is designed to automatically run
-experiments in a manner that iteratively adjusts parameter values so as to
-minimize some user-defined objective over a pre-defined state space in as few
-runs as possible.
+sigopt-spark integrates SigOpt's functionality into Spark for performing Bayesian
+optimization over hyperparameters. You can use this as a drop-in replacement for
+CrossValidator. Just provide your SigOpt client token and the number of iterations
+you'd like to use.
 
 ####Example Usage
 
@@ -19,7 +18,7 @@ val sqlContext = new org.apache.spark.sql.SQLContext(sc)
 val data = sqlContext.read.format("libsvm").load("data/mllib/sample_linear_regression_data.txt")
 
 val lr = new LinearRegression()
-val cv = new CrossValidator()
+val cv = new SigOptCrossValidator()
 
 cv.setNumFolds(10)
 cv.setEstimator(lr)
