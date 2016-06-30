@@ -49,7 +49,7 @@ class SigOptCrossValidator (override val uid: String) extends CrossValidator {
     this.experimentId = i
   }
 
-  def setSigCV(name: String, token: String, iters: Int, parameters: Seq[(String, Double, Double, String)]) = {
+  def createExperiment(name: String, token: String, iters: Int, parameters: Seq[(String, Double, Double, String)]) = {
     Sigopt.clientToken = token
     this.setNumIterations(iters)
     val e: Experiment = Experiment.create()

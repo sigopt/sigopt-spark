@@ -27,7 +27,7 @@ runs as possible.
 	// Establish the experiment: (name: String, api_token: String, iteration: int, bounds)
 	// Format of bounds is: Array((String,Double,Double,String))
 	// (ParameterName :String, Max: Double, Min: Double, type: String)
-	>>>val bounds =  Array(("elasticNetParam", 1.0, 0.0, "double"), ("regParam",1.0,0.0, "double"))
+	>>>val bounds = Array(("elasticNetParam", 1.0, 0.0, "double"), ("regParam",1.0,0.0, "double"))
 	>>>cv.createExperiment("Timing", YOUR_CLIENT_TOKEN, 10, bounds)
 	>>>cv.askSuggestion(lr)
 	>>>cv.fit(data)
