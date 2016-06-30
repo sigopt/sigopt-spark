@@ -38,7 +38,7 @@ import scala.collection.JavaConverters._
  */
 @Experimental
 class SigOptCrossValidator (override val uid: String) extends CrossValidator {
-  var numIterations: Int = 0
+  var numIterations: Int = -1
   var experimentId: String = ""
 
   def setNumIterations(i: Int) {
@@ -100,8 +100,10 @@ class SigOptCrossValidator (override val uid: String) extends CrossValidator {
     transformSchema(schema)
     val est = $(estimator)
     val eval = $(evaluator)
-    val numModels = this.numIterations
-    var i = 0
+
+    val experiment = Experiment.fetch(this.experimentId).call();
+    val numModels = if (this.numIterations < 0) 10 * experiment.getParameters().size() else this.numIterations
+
     val observations = for {
       _ <- (1 to this.numIterations)
     } yield {
