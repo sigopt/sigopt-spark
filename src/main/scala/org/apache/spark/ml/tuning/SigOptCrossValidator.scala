@@ -109,8 +109,8 @@ class SigOptCrossValidator (override val uid: String) extends CrossValidator {
       val accMetrics = for {
         (training, validation) <- splits
       } yield {
-        val trainingDataset = sqlContext.createDataFrame(training, schema).cache();
-        val validationDataset = sqlContext.createDataFrame(validation, schema).cache();
+        val trainingDataset = sqlContext.createDataFrame(training, schema).cache()
+        val validationDataset = sqlContext.createDataFrame(validation, schema).cache()
         val models = est.fit(trainingDataset, epm(0))
         eval.evaluate((models.asInstanceOf[Model[_]]).transform(validationDataset, epm(0)))
       }

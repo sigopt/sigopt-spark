@@ -1,5 +1,6 @@
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.sql
+import org.apache.spark.sql.{Row, SQLContext}
+import org.apache.spark.sql.types.{DoubleType, StructField, StructType}
 import org.apache.spark.ml.tuning.SigOptCrossValidator
 import org.apache.spark.ml.evaluation.RegressionEvaluator
 import org.apache.spark.ml.regression.LinearRegression
@@ -11,6 +12,9 @@ object LinearRegressionCV {
     var clientToken = args.headOption.getOrElse("FAKE_CLIENT_TOKEN")
     val conf = new SparkConf().setAppName("SigOpt Example").setMaster("local")
     val spark = new SparkContext(conf)
+    val sqlContext = new SQLContext(spark)
+    import sqlContext.implicits._
+
     val cv = new SigOptCrossValidator("123")
     val lr = new LinearRegression()
     cv.setEstimator(lr)
@@ -19,11 +23,12 @@ object LinearRegressionCV {
     cv.setEvaluator(new RegressionEvaluator())
     cv.createExperiment(
       "SigOpt CV Example",
-      "CLIENT_TOKEN",
+      clientToken,
       10,
       List(("elasticNetParam", 1.0, 0.0, "double"), ("regParam", 1.0, 0.0, "double"))
     )
-    cv.fit(MLUtils.loadLibSVMFile(spark, "data/mllib/sample_linear_regression_data.txt"))
+    val training = MLUtils.loadLibSVMFile(spark, "data/mllib/sample_linear_regression_data.txt").toDF()
+    cv.fit(training)
     spark.stop()
   }
 }
