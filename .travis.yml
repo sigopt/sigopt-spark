@@ -4,5 +4,5 @@ scala:
   - 2.11.8
 
 sudo: false
-
+ 
 script: sbt compile
