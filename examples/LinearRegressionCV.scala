@@ -17,13 +17,16 @@ object LinearRegressionCV {
 
     val cv = new SigOptCrossValidator("123")
     val lr = new LinearRegression()
+    cv.setGlobalClientToken(clientToken)
     cv.setEstimator(lr)
     cv.setNumFolds(5)
     cv.setNumIterations(10)
     cv.setEvaluator(new RegressionEvaluator())
+
+    // If your experiment has already been created, you can just set the ID instead
+    // cv.setExperimentId("4866")
     cv.createExperiment(
       "SigOpt CV Example",
-      clientToken,
       10,
       List(("elasticNetParam", 0.0, 1.0, "double"), ("regParam", 0.0, 1.0, "double"))
     )
