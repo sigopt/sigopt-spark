@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -e
+
+VERSION=$1
+if [ "x" = "x$VERSION" ]; then
+  echo 'Must provide version to deploy.'
+  exit 1
+fi
+
+sbt clean
+sbt package
+sbt "+ package"
+sbt make-pom
+sbt "+ make-pom"
+
+echo
+echo
+
+declare -a FILES=( \
+  "target/scala-2.10/sigopt-spark_2.10-$VERSION.jar" \
+  "target/scala-2.10/sigopt-spark_2.10-$VERSION.pom" \
+  "target/scala-2.11/sigopt-spark_2.11-$VERSION.jar" \
+  "target/scala-2.11/sigopt-spark_2.11-$VERSION.pom" \
+)
+
+echo 'Publishing the following files:'
+for FILE in ${FILES[@]}; do
+  echo "  $FILE"
+done
+echo
+
+read -s -p "Enter GPG signing passphrase:" GPG_PASSPHRASE
+echo
+for FILE in ${FILES[@]}; do
+  echo "$GPG_PASSPHRASE" | gpg -ab --batch --passphrase-fd 0 "$FILE"
+done
+
+echo 'Upload these files to bintray and then publish to Maven Central'
+for FILE in ${FILES[@]}; do
+  echo "  $FILE"
+  echo "  $FILE.asc"
+done
