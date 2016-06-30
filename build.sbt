@@ -2,7 +2,8 @@ name := "sigopt-spark"
 
 version := "0.0.1"
 
-organization := "SigOpt"
+organization := "com.sigopt"
+organizationName := "SigOpt"
 
 scalaVersion := "2.11.8"
 
