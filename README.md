@@ -1,8 +1,12 @@
 # SigSpark
+
 Compiles against the Spark 2.0 build. 
 
-
-SigSpark integrates SigOpt's functionality into Spark for performing Bayesian optimization over hyperparameters. It is designed to automatically run experiments  in a manner that iteratively adjusts parameter values so as to minimize some user-defined objective over a pre-defined state space in as few runs as possible.
+SigSpark integrates SigOpt's functionality into Spark for performing Bayesian
+optimization over hyperparameters. It is designed to automatically run
+experiments  in a manner that iteratively adjusts parameter values so as to
+minimize some user-defined objective over a pre-defined state space in as few
+runs as possible.
 
 ####Relevant Publications
 
@@ -25,7 +29,7 @@ SigSpark integrates SigOpt's functionality into Spark for performing Bayesian op
     Michael Gelbart, Jasper Snoek and Ryan Prescott Adams
     Uncertainty in Artificial Intelligence, 2014
 
-    www.blog.sigopt.com
+    https://blog.sigopt.com
 
 ####Example Usage 
 
@@ -39,8 +43,8 @@ SigSpark integrates SigOpt's functionality into Spark for performing Bayesian op
 	>>>val lr = new LinearRegression()
 	>>>val cv = new CrossValidator()
 
-	Format of bounds is: Array((String,Double,Double,String))
-	(ParameterName :String, Max: Double, Min: Double, type: String)
+	// Format of bounds is: Array((String,Double,Double,String))
+	// (ParameterName :String, Max: Double, Min: Double, type: String)
 
 	>>>val bounds =  Array(("elasticNetParam", 1.0, 0.0, "double"), ("regParam",1.0,0.0, "double"))
 
@@ -48,11 +52,9 @@ SigSpark integrates SigOpt's functionality into Spark for performing Bayesian op
 	>>>cv.setEstimator(lr)
 	>>>cv.setEvaluator(new RegressionEvaluator)
 
-	Establish the experiment: (name: String, api_token: String, iteration: int, bounds)
+	// Establish the experiment: (name: String, api_token: String, iteration: int, bounds)
 
-	>>>cv.setSigCV("Timing","ADGGBVMWFCLSDKFMGVMFLKF", 10, bounds)
+	>>>cv.setSigCV("Timing", YOUR_CLIENT_TOKEN, 10, bounds)
 	>>>cv.askSuggestion(lr)
 
 	>>>cv.SigFit(data)
-
-####Application to topic modeling
