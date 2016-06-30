@@ -8,18 +8,22 @@ import org.apache.spark.mllib.util.MLUtils
 
 object LinearRegressionCV {
   def main(args: Array[String]): Unit ={
+    var clientToken = args.headOption.getOrElse("FAKE_CLIENT_TOKEN")
     val conf = new SparkConf().setAppName("SigOpt Example").setMaster("local")
     val spark = new SparkContext(conf)
-    val training = MLUtils.loadLibSVMFile(spark, "data/mllib/sample_linear_regression_data.txt")
     val cv = new SigOptCrossValidator("123")
     val lr = new LinearRegression()
     cv.setEstimator(lr)
     cv.setNumFolds(5)
     cv.setNumIterations(10)
     cv.setEvaluator(new RegressionEvaluator())
-    cv.createExperiment("SigOpt CV Example",args(0), 10, Array(("elasticNetParam", 1.0, 0.0, "double"), ("regParam",1.0,0.0, "double")))
-    cv.askSuggestion(cv.getEstimator)
-    cv.fit(training)
+    cv.createExperiment(
+      "SigOpt CV Example",
+      "CLIENT_TOKEN",
+      10,
+      List(("elasticNetParam", 1.0, 0.0, "double"), ("regParam", 1.0, 0.0, "double"))
+    )
+    cv.fit(MLUtils.loadLibSVMFile(spark, "data/mllib/sample_linear_regression_data.txt"))
     spark.stop()
   }
 }
