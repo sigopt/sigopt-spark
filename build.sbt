@@ -9,6 +9,13 @@ scalaVersion := "2.11.8"
 
 crossScalaVersions := Seq("2.10.6")
 
+// Generate X-sources.jar
+mappings in (Compile, packageSrc) ++= {
+  val base  = (sourceManaged  in Compile).value
+  val files = (managedSources in Compile).value
+  files.map { f => (f, f.relativeTo(base).get.getPath) }
+}
+
 libraryDependencies <++= (scalaVersion) { scalaVersion =>
   val v = scalaVersion match {
     case twoTen if scalaVersion.startsWith("2.10") => "_2.10"
