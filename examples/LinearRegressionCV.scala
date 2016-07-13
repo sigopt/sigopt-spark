@@ -30,7 +30,7 @@ object LinearRegressionCV {
       "SigOpt CV Example",
       List(("elasticNetParam", 0.0, 1.0, "double"), ("regParam", 0.0, 1.0, "double"))
     )
-    val training = MLUtils.loadLibSVMFile(spark, "data/mllib/sample_linear_regression_data.txt").toDF()
+    val training = MLUtils.loadLibSVMFile(spark, "examples/data/sample_linear_regression_data.txt").toDF()
     cv.fit(training)
     spark.stop()
   }
