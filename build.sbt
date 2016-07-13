@@ -25,7 +25,8 @@ libraryDependencies <++= (scalaVersion) { scalaVersion =>
   Seq(
     "com.sigopt"                  %  ("sigopt-java") % "2.3.1",
     "org.apache.spark"            %  ("spark-core" + v) % "1.6.1",
-    "org.apache.spark"            %  ("spark-mllib" + v) % "1.6.1"
+    "org.apache.spark"            %  ("spark-mllib" + v) % "1.6.1",
+    "org.json4s"                  %  ("json4s-jackson" + v) % "{3.1.0}"
   )
 }
 

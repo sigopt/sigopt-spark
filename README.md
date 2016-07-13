@@ -97,12 +97,13 @@ cv.setEvaluator(new RegressionEvaluator)
 // Establish the experiment: (name: String, api_token: String, iteration: int, bounds)
 // Format of bounds is: Array((name: String, min: Double, max: Double, type: String))
 val bounds = Array(("elasticNetParam", 0.0, 1.0, "double"), ("regParam", 0.0, 1.0, "double"))
-cv.setGlobalClientToken(YOUR_CLIENT_TOKEN)
-cv.createExperiment("Timing", 10, bounds)
+cv.set
+cv.setClientToken(YOUR_CLIENT_TOKEN)
+cv.createExperiment("Timing", bounds)
 cv.fit(data)
 
 // If your experiment has already been created, you can just set the ID instead
-cv.setGlobalClientToken(YOUR_CLIENT_TOKEN)
+cv.setClientToken(YOUR_CLIENT_TOKEN)
 cv.setExperimentId("1")
 cv.fit(data)
 ```
