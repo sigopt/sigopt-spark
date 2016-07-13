@@ -56,7 +56,7 @@ Scala 2.10 users: Add this dependency to your project's POM:
 <dependency>
   <groupId>com.sigopt</groupId>
   <artifactId>sigopt-spark_2.10</artifactId>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
@@ -66,7 +66,7 @@ Scala 2.11 users: Add this dependency to your project's POM:
 <dependency>
   <groupId>com.sigopt</groupId>
   <artifactId>sigopt-spark_2.11</artifactId>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 

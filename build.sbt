@@ -1,6 +1,6 @@
 name := "sigopt-spark"
 
-version := "0.0.1"
+version := "1.0.0"
 
 organization := "com.sigopt"
 organizationName := "SigOpt"
