@@ -7,7 +7,7 @@ optimization over hyperparameters. You can use this as a drop-in replacement for
 CrossValidator. Just provide your SigOpt client token and the number of iterations
 you'd like to use.
 
-##Installation
+## Installation
 
 ### Maven users
 
@@ -77,7 +77,7 @@ You'll need to manually install the following JARs:
 * Apache Spark version 1.6.1
 * The sigopt-spark JAR.
 
-##Example Usage
+## Example Usage
 
 ```scala
 import org.apache.spark.ml.tuning.CrossValidator
