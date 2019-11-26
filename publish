@@ -15,19 +15,19 @@ sbt "+ publishLocal"
 echo
 echo
 
-mv "$HOME/.ivy2/local/com.sigopt/sigopt-spark_2.10/$VERSION/poms/sigopt-spark_2.10.pom" target/scala-2.10
-mv "$HOME/.ivy2/local/com.sigopt/sigopt-spark_2.10/$VERSION/jars/sigopt-spark_2.10.jar" target/scala-2.10
-mv "$HOME/.ivy2/local/com.sigopt/sigopt-spark_2.10/$VERSION/srcs/sigopt-spark_2.10-sources.jar" target/scala-2.10
-mv "$HOME/.ivy2/local/com.sigopt/sigopt-spark_2.10/$VERSION/docs/sigopt-spark_2.10-javadoc.jar" target/scala-2.10
+mv "$HOME/.ivy2/local/com.sigopt/sigopt-spark_2.12/$VERSION/poms/sigopt-spark_2.12.pom" target/scala-2.12
+mv "$HOME/.ivy2/local/com.sigopt/sigopt-spark_2.12/$VERSION/jars/sigopt-spark_2.12.jar" target/scala-2.12
+mv "$HOME/.ivy2/local/com.sigopt/sigopt-spark_2.12/$VERSION/srcs/sigopt-spark_2.12-sources.jar" target/scala-2.12
+mv "$HOME/.ivy2/local/com.sigopt/sigopt-spark_2.12/$VERSION/docs/sigopt-spark_2.12-javadoc.jar" target/scala-2.12
 mv "$HOME/.ivy2/local/com.sigopt/sigopt-spark_2.11/$VERSION/poms/sigopt-spark_2.11.pom" target/scala-2.11
 mv "$HOME/.ivy2/local/com.sigopt/sigopt-spark_2.11/$VERSION/jars/sigopt-spark_2.11.jar" target/scala-2.11
 mv "$HOME/.ivy2/local/com.sigopt/sigopt-spark_2.11/$VERSION/srcs/sigopt-spark_2.11-sources.jar" target/scala-2.11
 mv "$HOME/.ivy2/local/com.sigopt/sigopt-spark_2.11/$VERSION/docs/sigopt-spark_2.11-javadoc.jar" target/scala-2.11
 declare -a FILES=( \
-  "target/scala-2.10/sigopt-spark_2.10-$VERSION.jar" \
-  "target/scala-2.10/sigopt-spark_2.10-$VERSION.pom" \
-  "target/scala-2.10/sigopt-spark_2.10-${VERSION}-sources.jar" \
-  "target/scala-2.10/sigopt-spark_2.10-${VERSION}-javadoc.jar" \
+  "target/scala-2.12/sigopt-spark_2.12-$VERSION.jar" \
+  "target/scala-2.12/sigopt-spark_2.12-$VERSION.pom" \
+  "target/scala-2.12/sigopt-spark_2.12-${VERSION}-sources.jar" \
+  "target/scala-2.12/sigopt-spark_2.12-${VERSION}-javadoc.jar" \
   "target/scala-2.11/sigopt-spark_2.11-$VERSION.jar" \
   "target/scala-2.11/sigopt-spark_2.11-$VERSION.pom" \
   "target/scala-2.11/sigopt-spark_2.11-${VERSION}-sources.jar" \

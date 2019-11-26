@@ -32,7 +32,7 @@ import org.apache.spark.ml.param._
 import org.apache.spark.ml.tuning._
 import org.apache.spark.ml.util._
 import org.apache.spark.mllib.util.MLUtils
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.{Dataset, DataFrame, SQLContext}
 import org.apache.spark.sql.types.StructType
 import org.json4s.{DefaultFormats, JObject, JValue}
 import org.json4s.jackson.JsonMethods.{compact, parse, render}
@@ -249,7 +249,7 @@ class SigOptCrossValidator (override val uid: String)
       .call()
   }
 
-  override def fit(dataset: DataFrame): SigOptCrossValidatorModel = {
+  override def fit(dataset: Dataset[_]): SigOptCrossValidatorModel = {
     val sqlContext = dataset.sqlContext
     val schema = dataset.schema
     transformSchema(schema)
@@ -267,7 +267,7 @@ class SigOptCrossValidator (override val uid: String)
     } yield {
       val suggestion = createSuggestion(eid, est)
       val epm = this.estimatorParamMapsFromAssignments(est, suggestion.getAssignments())
-      val splits = MLUtils.kFold(dataset.rdd, folds, 0)
+      val splits = MLUtils.kFold(dataset.toDF.rdd, folds, 0)
       val accMetrics = for {
         (training, validation) <- splits
       } yield {
@@ -348,7 +348,7 @@ class SigOptCrossValidatorModel private[spark] (
     val copied = new SigOptCrossValidatorModel(uid, bestModel.copy(extra).asInstanceOf[Model[_]])
     copyValues(copied, extra).setParent(parent)
   }
-	override def transform(dataset: DataFrame): DataFrame = {
+	override def transform(dataset: Dataset[_]): DataFrame = {
     transformSchema(dataset.schema, true)
     bestModel.transform(dataset)
   }
