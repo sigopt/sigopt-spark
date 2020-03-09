@@ -14,12 +14,12 @@ lr = LogisticRegression(maxIter=10)
 crossval = SigOptEstimator(estimator=lr, evaluator=RegressionEvaluator(), numFolds=3)
 crossval.setApiToken(SIGOPT_API_TOKEN)
 crossval.createExperiment(
+    {
+        lr.elasticNetParam: {'type': 'double', 'bounds': {'min': 0.0, 'max': 1.0}},
+        lr.regParam: {'type': 'double', 'bounds': {'min': 0.0, 'max': 1.0}},
+    },
     name='Pyspark Test',
     observation_budget=21,
-    parameters=[
-      {'name': 'elasticNetParam', 'type': 'double', 'bounds': {'min': 0.0, 'max': 1.0}},
-      {'name': 'regParam', 'type': 'double', 'bounds': {'min': 0.0, 'max': 1.0}},
-    ],
 )
 
 # Run cross-validation, and choose the best set of parameters.
