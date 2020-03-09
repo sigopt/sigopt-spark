@@ -79,6 +79,6 @@ You'll need to manually install the following JARs:
 
 ## Example Usage
 
-Check out our [Scala Example][../examples/LinearRegressionCV.scala].
+Check out our [Scala Example](../examples/LinearRegressionCV.scala).
 
-More examples available in our [../examples][examples section].
+More examples available in our [examples section](../examples).
