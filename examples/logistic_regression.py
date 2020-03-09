@@ -1,7 +1,7 @@
 # Get API token from https://app.sigopt.com/tokens
 SIGOPT_API_TOKEN = 'PUT_YOUR_API_TOKEN_HERE'
 
-from sigoptspark.estimator import SigOptEstimator
+from sigopt_spark.estimator import SigOptEstimator
 
 from pyspark.ml.classification import LogisticRegression
 from pyspark.ml.evaluation import RegressionEvaluator

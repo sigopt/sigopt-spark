@@ -1,13 +1,13 @@
 from setuptools import setup
 
 setup(
-  name='sigoptspark',
+  name='sigopt-spark',
   version='1.0.0',
   description='SigOpt Pyspark Integration',
   author='SigOpt',
   author_email='support@sigopt.com',
   url='https://sigopt.com/',
-  packages=['sigoptspark'],
+  packages=['sigopt_spark'],
   install_requires=install_requires,
   install_requires = ['sigopt>=6.0.0', 'pyspark>=2.0.0'],
   classifiers=[
