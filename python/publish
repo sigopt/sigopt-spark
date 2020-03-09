@@ -24,4 +24,4 @@ for FILE in `ls dist/*$VERSION*`; do
   echo "  $FILE"
 done
 
-twine uploa "dist/*$VERSION*"
+twine upload "dist/*$VERSION*"
