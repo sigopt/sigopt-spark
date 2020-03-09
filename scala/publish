@@ -40,6 +40,7 @@ for FILE in ${FILES[@]}; do
 done
 echo
 
+export GPG_TTY=$(tty)
 read -s -p "Enter GPG signing passphrase:" GPG_PASSPHRASE
 echo
 for FILE in ${FILES[@]}; do
