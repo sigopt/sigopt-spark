@@ -19,17 +19,19 @@ class _SigOptEstimatorParams(HasSeed):
                      typeConverter=TypeConverters.toInt)
     apiToken = Param(Params._dummy(), "apiToken", "SigOpt API Token")
     experimentId = Param(Params._dummy(), "experimentId", "SigOpt Experiment ID")
+    parameterMap = Param(Params._dummy(), "parameterMap", "Mapping from SigOpt parameter name to estimator Param")
 
 
 class SigOptEstimator(Estimator, _SigOptEstimatorParams):
     @keyword_only
-    def __init__(self, estimator=None, evaluator=None, numFolds=3, apiToken=None, experimentId=None):
+    def __init__(self, estimator=None, evaluator=None, numFolds=3, apiToken=None, experimentId=None, parameterMap=None):
         super(SigOptEstimator, self).__init__()
+        self._setDefault(numFolds=3, parameterMap={})
         kwargs = self._input_kwargs
         self._set(**kwargs)
 
     @keyword_only
-    def setParams(self, estimator=None, evaluator=None, numFolds=3, apiToken=None, experimentId=None):
+    def setParams(self, estimator=None, evaluator=None, numFolds=3, apiToken=None, experimentId=None, parameterMap=None):
         kwargs = self._input_kwargs
         return self._set(**kwargs)
 
@@ -39,17 +41,29 @@ class SigOptEstimator(Estimator, _SigOptEstimatorParams):
     def setExperimentId(self, value):
         return self._set(experimentId=value)
 
-    def createExperiment(self, **kwargs):
+    def setParameterMap(self, value):
+        return self._set(parameterMap=value)
+
+    def createExperiment(self, paramDefinitionMap, **experiment_kwargs):
         eva = self.getOrDefault(self.evaluator)
-        if 'metrics' not in kwargs:
-            kwargs['metrics'] = [{
+        if 'parameters' not in experiment_kwargs:
+            experiment_kwargs['parameters'] = []
+            for (param, definition) in paramDefinitionMap.items():
+                definition['name'] = definition.get('name', param.name)
+                experiment_kwargs['parameters'].append(definition)
+        if 'metrics' not in experiment_kwargs:
+            experiment_kwargs['metrics'] = [{
                 'name': 'metric',
                 'objective': ('maximize' if eva.isLargerBetter() else 'minimize'),
             }]
         apiToken = self.getOrDefault(self.apiToken)
         conn = sigopt.Connection(apiToken)
-        experiment = conn.experiments().create(**kwargs)
+        experiment = conn.experiments().create(**experiment_kwargs)
+        parameterMap = {}
+        for (param, definition) in paramDefinitionMap.items():
+            parameterMap[definition['name']] = param
         self.setExperimentId(experiment.id)
+        self.setParameterMap(parameterMap)
         return experiment
 
     def _fit(self, dataset):
@@ -78,8 +92,8 @@ class SigOptEstimator(Estimator, _SigOptEstimatorParams):
                 condition = (df[randCol] >= validateLB) & (df[randCol] < validateUB)
                 train = df.filter(~condition).cache()
                 validation = df.filter(condition).cache()
-                estimator._set(**suggestion.assignments)
-                model = estimator.fit(train)
+                params = self._get_params_from_assignments(suggestion.assignments)
+                model = estimator.fit(train, params)
                 metric_values.append(evaluator.evaluate(model.transform(validation)))
                 train.unpersist()
                 validation.unpersist()
@@ -94,9 +108,19 @@ class SigOptEstimator(Estimator, _SigOptEstimatorParams):
             experiment = conn.experiments(eid).fetch()
 
         bestObservation = conn.experiments(eid).best_assignments().fetch().data[0]
-        estimator._set(**bestObservation.assignments)
-        bestModel = estimator.fit(dataset)
+        params = self._get_params_from_assignments(bestObservation.assignments)
+        bestModel = estimator.fit(dataset, params)
         return self._copyValues(SigOptOptimizedModel(bestModel))
+
+    def _get_params_from_assignments(self, assignments):
+      parameterMap = self.getOrDefault(self.parameterMap)
+      ret = {}
+      for (assignmentName, value) in assignments.items():
+          param = parameterMap.get(assignmentName)
+          if param is None:
+              raise ValueError('No suggested value found for parameter: ' + str(assignmentName))
+          ret[param] = value
+      return ret
 
     def copy(self, extra=None):
         if extra is None:
