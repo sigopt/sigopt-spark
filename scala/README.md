@@ -79,31 +79,6 @@ You'll need to manually install the following JARs:
 
 ## Example Usage
 
-```scala
-import org.apache.spark.ml.tuning.CrossValidator
-import org.apache.spark.ml.regression.LinearRegression
-import org.apache.spark.ml.evaluation.RegressionEvaluator
+Check out our [Scala Example][../examples/LinearRegressionCV.scala].
 
-val sqlContext = new org.apache.spark.sql.SQLContext(sc)
-val data = sqlContext.read.format("libsvm").load("data/mllib/sample_linear_regression_data.txt")
-
-val lr = new LinearRegression()
-val cv = new SigOptCrossValidator()
-
-cv.setNumFolds(10)
-cv.setEstimator(lr)
-cv.setEvaluator(new RegressionEvaluator)
-
-// Establish the experiment: (name: String, api_token: String, iteration: int, bounds)
-// Format of bounds is: Array((name: String, min: Double, max: Double, type: String))
-val bounds = Array(("elasticNetParam", 0.0, 1.0, "double"), ("regParam", 0.0, 1.0, "double"))
-cv.set
-cv.setClientToken(YOUR_CLIENT_TOKEN)
-cv.createExperiment("Timing", bounds)
-cv.fit(data)
-
-// If your experiment has already been created, you can just set the ID instead
-cv.setClientToken(YOUR_CLIENT_TOKEN)
-cv.setExperimentId("1")
-cv.fit(data)
-```
+More examples available in our [../examples][examples section].
