@@ -8,7 +8,6 @@ setup(
   author_email='support@sigopt.com',
   url='https://sigopt.com/',
   packages=['sigopt_spark'],
-  install_requires=install_requires,
   install_requires = ['sigopt>=6.0.0', 'pyspark>=2.0.0'],
   classifiers=[
     "Development Status :: 5 - Production/Stable",
