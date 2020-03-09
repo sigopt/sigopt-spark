@@ -1,13 +1,13 @@
 name := "sigopt-spark"
 
-version := "1.0.0"
+version := "2.0.0"
 
 organization := "com.sigopt"
 organizationName := "SigOpt"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.8"
 
-crossScalaVersions := Seq("2.10.6")
+crossScalaVersions := Seq("2.11.12")
 
 // Generate X-sources.jar
 mappings in (Compile, packageSrc) ++= {
@@ -16,19 +16,12 @@ mappings in (Compile, packageSrc) ++= {
   files.map { f => (f, f.relativeTo(base).get.getPath) }
 }
 
-libraryDependencies <++= (scalaVersion) { scalaVersion =>
-  val v = scalaVersion match {
-    case twoTen if scalaVersion.startsWith("2.10") => "_2.10"
-    case twoEleven if scalaVersion.startsWith("2.11") => "_2.11"
-    case _ => "_" + scalaVersion
-  }
-  Seq(
-    "com.sigopt"                  %  ("sigopt-java") % "3.4.0",
-    "org.apache.spark"            %  ("spark-core" + v) % "1.6.1",
-    "org.apache.spark"            %  ("spark-mllib" + v) % "1.6.1",
-    "org.json4s"                  %  ("json4s-jackson" + v) % "3.1.0"
-  )
-}
+libraryDependencies ++= Seq(
+  "com.sigopt"        %  ("sigopt-java")     % "6.2.0",
+  "org.apache.spark"  %%  ("spark-core")     % "2.4.4",
+  "org.apache.spark"  %%  ("spark-mllib")    % "2.4.4",
+  "org.json4s"        %%  ("json4s-jackson") % "3.6.7",
+)
 
 pomIncludeRepository := { x => false }
 
