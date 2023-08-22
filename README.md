@@ -12,4 +12,4 @@ check out our comprehensive [API Documentation](https://app.sigopt.com/docs).
 
 ## General Information
 
-Repository: 2016-2022
+Repository: 2016-2023
